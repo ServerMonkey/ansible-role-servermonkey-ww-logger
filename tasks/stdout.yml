@@ -1,0 +1,34 @@
+---
+# log from stdout
+- name: Delete old log
+  connection: local
+  file:
+    path: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
+    state: absent
+  become: false
+
+- name: Save log
+  connection: local
+  copy:
+    content: '{{ ww_log.stdout }}'
+    dest: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
+    mode: 0644
+  when: ww_log.stdout != ""  # noqa 602
+  changed_when: false
+  become: false
+
+- name: Append log
+  connection: local
+  lineinfile:
+    line: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
+    dest: '{{ ww_loglist }}'
+    state: present
+    create: yes
+    mode: 0644
+  when: ww_log != ""  # noqa 602
+  become: false
+
+- name: Display log
+  debug:
+    var: ww_log.stdout_lines
+  when: ww_log.stdout != ""  # noqa 602

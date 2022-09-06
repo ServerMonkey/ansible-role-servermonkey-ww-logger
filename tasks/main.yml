@@ -1,0 +1,8 @@
+---
+- name: Log via stdout
+  include_tasks: stdout.yml
+  when: ww_log is defined and ww_msg is undefined
+
+- name: Log via msg
+  include_tasks: msg.yml
+  when: ww_msg is defined and ww_log is undefined
