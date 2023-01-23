@@ -1,5 +1,10 @@
 ---
 # log from custom message
+- name: Display log
+  debug:
+    var: ww_msg
+  when: ww_msg != ""  # noqa 602
+
 - name: Delete old log
   connection: local
   file:
@@ -13,22 +18,36 @@
     content: '{{ ww_msg }}'
     dest: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
     mode: 0644
-  when: ww_msg != ""  # noqa 602
+  when: not ww_nolog and ww_msg != ""  # noqa 602
   changed_when: false
   become: false
 
 - name: Append log
   connection: local
-  lineinfile:
-    line: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
-    dest: '{{ ww_loglist }}'
-    state: present
-    create: yes
-    mode: 0644
-  when: ww_msg != ""  # noqa 602
+  shell: echo "{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini" >>"{{ ww_loglist }}"
+  when: not ww_nolog and ww_msg != ""  # noqa 602
   become: false
 
-- name: Display log
-  debug:
-    var: ww_msg
-  when: ww_msg != ""  # noqa 602
+# this does not always work for some buggy reason
+#- name: Append log
+#  connection: local
+#  lineinfile:
+#    line: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
+#    dest: '{{ ww_loglist }}'
+#    state: present
+#    create: yes
+#    mode: 0644
+#  when: ww_msg != ""  # noqa 602
+#  become: false
+
+# help to debug the above
+#- name: show content {{ ww_loglist }}
+#  connection: local
+#  shell: cat {{ ww_loglist }}
+#  become: false
+#  register: testing_error
+#  run_once: true
+#  when: ser
+#
+#- debug:
+#    var: testing_error.stdout_lines
