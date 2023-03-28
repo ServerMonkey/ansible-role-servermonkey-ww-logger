@@ -7,6 +7,8 @@
 
 - name: Delete old log
   connection: local
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
   file:
     path: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
     state: absent
@@ -14,6 +16,8 @@
 
 - name: Save log
   connection: local
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
   copy:
     content: '{{ ww_log.stdout }}'
     dest: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
@@ -24,6 +28,8 @@
 
 - name: Append log
   connection: local
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
   shell: echo "{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini" >>"{{ ww_loglist }}"
   when: not ww_nolog and ww_log.stdout != ""  # noqa 602
   become: false
