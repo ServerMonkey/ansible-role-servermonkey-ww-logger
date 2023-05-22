@@ -1,5 +1,5 @@
 ww_home: "{{ lookup('env','HOME') }}/.ww/"
-ww_logbase: '{{ ww_home }}cache/logs/'
+ww_logbase: '{{ ww_home }}cache/logs/'  # path where to store logs
 # ww provides its own uniq ww_loglist path, this is a fallback for only ansible
-ww_loglist: '{{ ww_home }}cache/ww_logger.ini'
-ww_nolog: false
+ww_loglist: '{{ ww_home }}cache/ww_logger.ini'  # a list of all logs
+ww_nolog: false  # set to true if you are not using wildwest

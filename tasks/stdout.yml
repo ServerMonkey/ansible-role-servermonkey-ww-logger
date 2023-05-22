@@ -5,34 +5,36 @@
     var: ww_log.stdout_lines
   when: ww_log.stdout != ""  # noqa 602
 
-- name: Delete old log
-  connection: local
-  vars:
-    ansible_python_interpreter: "{{ ansible_playbook_python }}"
-  file:
-    path: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
-    state: absent
-  become: false
+- block:
+    - name: Delete old log
+      connection: local
+      vars:
+        ansible_python_interpreter: "{{ ansible_playbook_python }}"
+      file:
+        path: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
+        state: absent
+      become: false
 
-- name: Save log
-  connection: local
-  vars:
-    ansible_python_interpreter: "{{ ansible_playbook_python }}"
-  copy:
-    content: '{{ ww_log.stdout }}'
-    dest: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
-    mode: 0644
-  when: not ww_nolog and ww_log.stdout != "" # noqa 602
-  changed_when: false
-  become: false
+    - name: Save log
+      connection: local
+      vars:
+        ansible_python_interpreter: "{{ ansible_playbook_python }}"
+      copy:
+        content: '{{ ww_log.stdout }}'
+        dest: '{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini'
+        mode: 0644
+      when: ww_log.stdout != "" # noqa 602
+      changed_when: false
+      become: false
 
-- name: Append log
-  connection: local
-  vars:
-    ansible_python_interpreter: "{{ ansible_playbook_python }}"
-  shell: echo "{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini" >>"{{ ww_loglist }}"
-  when: not ww_nolog and ww_log.stdout != ""  # noqa 602
-  become: false
+    - name: Append log
+      connection: local
+      vars:
+        ansible_python_interpreter: "{{ ansible_playbook_python }}"
+      shell: echo "{{ ww_logbase }}{{ inventory_hostname }}_{{ ww_logfile }}.ini" >>"{{ ww_loglist }}"
+      when: ww_log.stdout != ""  # noqa 602
+      become: false
+  when: not ww_nolog
 
 #- name: Append log
 #  connection: local
